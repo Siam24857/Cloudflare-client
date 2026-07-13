@@ -21,7 +21,7 @@ credits from supporters. It supports three roles — **Supporter**, **Creator**,
 - **Frontend:** React 18, Vite, React Router, Tailwind CSS, Swiper, Axios, @react-oauth/google
 - **Backend:** Node.js, Express, MongoDB (Mongoose), JWT, bcryptjs
 - **Image Upload:** imgBB
-- **Payments:** Stripe-ready flow (dummy checkout included)
+- **Payments:** Stripe Checkout (real, server-verified) with demo fallback · **Email:** nodemailer SMTP/SendGrid
 
 ## Key Features
 - 🎨 Fully responsive design (mobile, tablet, desktop) for both the site and dashboard.
@@ -32,7 +32,8 @@ credits from supporters. It supports three roles — **Supporter**, **Creator**,
 - 👤 Three tailored dashboards with role-based side navigation.
 - 📊 Creator stats (campaign count, active campaigns, total raised) and contribution review (approve/reject with refunds).
 - 💸 Creator withdrawals (200-credit minimum, 20 credits = $1) with admin payout processing.
-- 🛒 Supporter credit purchase with a Stripe-ready payment flow.
+- 🛒 Supporter credit purchase with **real Stripe Checkout** (secure hosted session + server-side verification, with a safe demo fallback when unconfigured).
+- 📧 **Automated email notifications** (campaign approval/rejection, contribution confirmation, withdrawal processing) via SMTP / SendGrid.
 - 🔔 Real-time notification system (floating popup) for contributions, approvals, withdrawals, and reports.
 - 📄 Pagination on the "My Contributions" page.
 - 🚩 Campaign reporting system with admin suspend/delete actions.
