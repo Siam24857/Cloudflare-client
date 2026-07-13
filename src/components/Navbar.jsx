@@ -57,6 +57,7 @@ export default function Navbar() {
                   <img
                     src={user.photoURL || "/favicon.svg"}
                     alt={user.name}
+                    referrerPolicy="no-referrer"
                     className="h-9 w-9 rounded-full border border-slate-200 object-cover"
                   />
                   <div className="leading-tight">
