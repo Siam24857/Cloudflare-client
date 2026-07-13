@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useState } from "react";
 import { paymentAPI } from "../../api.js";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { Modal, SectionTitle, Spinner } from "../../components/ui.jsx";
@@ -14,62 +13,25 @@ const PACKAGES = [
 
 export default function PurchaseCredit() {
   const { user, setUser } = useAuth();
-  const navigate = useNavigate();
-  const [params] = useSearchParams();
   const [selected, setSelected] = useState(null);
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
 
-  // Stripe redirects back here with ?session_id=... — verify and credit the account.
-  useEffect(() => {
-    const sessionId = params.get("session_id");
-    if (!sessionId) return;
-    (async () => {
-      setBusy(true);
-      try {
-        const res = await paymentAPI.verify(sessionId);
-        if (res.data.ok) {
-          setUser({ credits: user.credits + res.data.credits });
-          setDone(true);
-        }
-      } catch (e) {
-        /* ignore */
-      } finally {
-        setBusy(false);
-        navigate("/dashboard/purchase-credit", { replace: true });
-      }
-    })();
-    // eslint-disable-next-line
-  }, []);
-
   const pay = async () => {
     setBusy(true);
     try {
-      // Try real Stripe Checkout first; server returns a hosted URL.
-      const res = await paymentAPI.createCheckout({
-        credits: selected.credits,
-        price: selected.price,
+      // Simulated payment — saves the payment record and credits the account.
+      const res = await paymentAPI.create({
+        amount_paid: selected.price,
+        credits_added: selected.credits,
+        transaction_id: `txn_${Date.now()}`,
       });
-      if (res.data.url) {
-        window.location.href = res.data.url;
-        return;
-      }
-      throw new Error("no-stripe");
-    } catch (e) {
-      // Fallback: simulated payment when Stripe is not configured.
-      try {
-        const res = await paymentAPI.create({
-          amount_paid: selected.price,
-          credits_added: selected.credits,
-          transaction_id: `stripe_demo_${Date.now()}`,
-        });
-        setUser({ credits: user.credits + res.data.credits_added });
-        setDone(true);
-      } catch (err) {
-        setSelected({ ...selected, error: true });
-      } finally {
-        setBusy(false);
-      }
+      setUser({ credits: user.credits + res.data.credits_added });
+      setDone(true);
+    } catch (err) {
+      setSelected({ ...selected, error: true });
+    } finally {
+      setBusy(false);
     }
   };
 
@@ -119,7 +81,7 @@ export default function PurchaseCredit() {
               <p className="mt-2 text-sm text-rose-500">Payment failed, try again.</p>
             )}
             <p className="mt-3 rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-400">
-              Payments are processed securely via Stripe Checkout.
+              Simulated payment — your credits are added to your balance instantly.
             </p>
             <div className="mt-4 flex gap-3">
               <button disabled={busy} onClick={pay} className="btn-primary flex-1">

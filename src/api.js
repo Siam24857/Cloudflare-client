@@ -81,8 +81,6 @@ export const paymentAPI = {
   supporterAll: () => api.get("/api/payments/supporter"),
   create: (data) => api.post("/api/payments", data),
   adminAll: () => api.get("/api/payments/admin/all"),
-  createCheckout: (data) => api.post("/api/payments/create-checkout", data),
-  verify: (sessionId) => api.get(`/api/payments/verify?session_id=${sessionId}`),
 };
 
 // ---------- Reports ----------
