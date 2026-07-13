@@ -26,7 +26,7 @@ export default function PurchaseCredit() {
         credits_added: selected.credits,
         transaction_id: `txn_${Date.now()}`,
       });
-      setUser({ credits: user.credits + res.data.credits_added });
+      setUser({ credits: res.data.credits });
       setDone(true);
     } catch (err) {
       setSelected({ ...selected, error: true });
