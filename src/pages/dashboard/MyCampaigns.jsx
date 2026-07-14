@@ -10,9 +10,11 @@ export default function MyCampaigns() {
   const [busy, setBusy] = useState(false);
   const [confirm, setConfirm] = useState(null);
 
-  const load = () =>
-    campaignAPI.myCampaigns().then((r) => setCampaigns(r.data)).catch(() => setCampaigns([]));
-
+  const load = () => {
+    let mounted = true;
+    campaignAPI.myCampaigns().then((r) => { if (mounted) setCampaigns(r.data); }).catch(() => { if (mounted) setCampaigns([]); });
+    return () => { mounted = false; };
+  };
   useEffect(load, []);
 
   const saveEdit = async () => {

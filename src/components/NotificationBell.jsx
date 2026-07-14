@@ -20,8 +20,18 @@ export default function NotificationBell() {
   };
 
   useEffect(() => {
-    load();
-    // eslint-disable-next-line
+    let mounted = true;
+    const doLoad = async () => {
+      if (!user) return;
+      try {
+        const res = await notificationAPI.all();
+        if (mounted) setItems(res.data);
+      } catch (e) {
+        /* ignore */
+      }
+    };
+    doLoad();
+    return () => { mounted = false; };
   }, [user]);
 
   const unread = items.filter((n) => !n.read).length;

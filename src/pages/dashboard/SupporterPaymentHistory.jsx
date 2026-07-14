@@ -6,10 +6,12 @@ export default function SupporterPaymentHistory() {
   const [payments, setPayments] = useState(null);
 
   useEffect(() => {
+    let mounted = true;
     paymentAPI
       .supporterAll()
-      .then((r) => setPayments(r.data))
-      .catch(() => setPayments([]));
+      .then((r) => { if (mounted) setPayments(r.data); })
+      .catch(() => { if (mounted) setPayments([]); });
+    return () => { mounted = false; };
   }, []);
 
   return (

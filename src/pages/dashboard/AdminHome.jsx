@@ -8,10 +8,12 @@ export default function AdminHome() {
   const [stats, setStats] = useState(null);
 
   useEffect(() => {
+    let mounted = true;
     userAPI
       .adminStats()
-      .then((r) => setStats(r.data))
-      .catch(() => setStats({}));
+      .then((r) => { if (mounted) setStats(r.data); })
+      .catch(() => { if (mounted) setStats({}); });
+    return () => { mounted = false; };
   }, []);
 
   if (!stats) return <Spinner />;

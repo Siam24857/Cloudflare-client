@@ -7,8 +7,11 @@ export default function WithdrawalRequests() {
   const [list, setList] = useState(null);
   const [busy, setBusy] = useState(null);
 
-  const load = () =>
-    withdrawalAPI.adminPending().then((r) => setList(r.data)).catch(() => setList([]));
+  const load = () => {
+    let mounted = true;
+    withdrawalAPI.adminPending().then((r) => { if (mounted) setList(r.data); }).catch(() => { if (mounted) setList([]); });
+    return () => { mounted = false; };
+  };
   useEffect(load, []);
 
   const approve = async (id) => {

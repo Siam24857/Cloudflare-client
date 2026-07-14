@@ -10,10 +10,12 @@ export default function MyContributions() {
   const [data, setData] = useState(null);
 
   useEffect(() => {
+    let mounted = true;
     contributionAPI
       .supporterAll(page, LIMIT)
-      .then((r) => setData(r.data))
-      .catch(() => setData({ contributions: [], total: 0, totalPages: 1 }));
+      .then((r) => { if (mounted) setData(r.data); })
+      .catch(() => { if (mounted) setData({ contributions: [], total: 0, totalPages: 1 }); });
+    return () => { mounted = false; };
   }, [page]);
 
   if (!data) return <Spinner />;

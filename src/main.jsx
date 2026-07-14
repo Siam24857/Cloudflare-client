@@ -6,16 +6,24 @@ import App from "./App.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import "./index.css";
 
-const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
+const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <GoogleOAuthProvider clientId={googleClientId}>
+    {googleClientId ? (
+      <GoogleOAuthProvider clientId={googleClientId}>
+        <BrowserRouter>
+          <AuthProvider>
+            <App />
+          </AuthProvider>
+        </BrowserRouter>
+      </GoogleOAuthProvider>
+    ) : (
       <BrowserRouter>
         <AuthProvider>
           <App />
         </AuthProvider>
       </BrowserRouter>
-    </GoogleOAuthProvider>
+    )}
   </React.StrictMode>
 );

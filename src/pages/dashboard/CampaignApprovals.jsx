@@ -7,8 +7,11 @@ export default function CampaignApprovals() {
   const [list, setList] = useState(null);
   const [busy, setBusy] = useState(null);
 
-  const load = () =>
-    campaignAPI.pending().then((r) => setList(r.data)).catch(() => setList([]));
+  const load = () => {
+    let mounted = true;
+    campaignAPI.pending().then((r) => { if (mounted) setList(r.data); }).catch(() => { if (mounted) setList([]); });
+    return () => { mounted = false; };
+  };
   useEffect(load, []);
 
   const act = async (id, fn) => {

@@ -9,12 +9,12 @@ export default function CreatorHome() {
   const [view, setView] = useState(null);
   const [busy, setBusy] = useState(null);
 
-  const load = () => {
-    campaignAPI.myCampaigns().then((r) => setCampaigns(r.data)).catch(() => setCampaigns([]));
-    contributionAPI.creatorPending().then((r) => setPending(r.data)).catch(() => setPending([]));
-  };
-
-  useEffect(load, []);
+  useEffect(() => {
+    let mounted = true;
+    campaignAPI.myCampaigns().then((r) => { if (mounted) setCampaigns(r.data); }).catch(() => { if (mounted) setCampaigns([]); });
+    contributionAPI.creatorPending().then((r) => { if (mounted) setPending(r.data); }).catch(() => { if (mounted) setPending([]); });
+    return () => { mounted = false; };
+  }, []);
 
   if (campaigns === null) return <Spinner />;
 

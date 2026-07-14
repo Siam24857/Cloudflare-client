@@ -9,7 +9,11 @@ export default function ManageUsers() {
   const [users, setUsers] = useState(null);
   const [busy, setBusy] = useState(null);
 
-  const load = () => userAPI.all().then((r) => setUsers(r.data)).catch(() => setUsers([]));
+  const load = () => {
+    let mounted = true;
+    userAPI.all().then((r) => { if (mounted) setUsers(r.data); }).catch(() => { if (mounted) setUsers([]); });
+    return () => { mounted = false; };
+  };
   useEffect(load, []);
 
   const changeRole = async (id, role) => {

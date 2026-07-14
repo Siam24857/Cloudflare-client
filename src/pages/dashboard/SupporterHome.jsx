@@ -7,8 +7,10 @@ export default function SupporterHome() {
   const [approved, setApproved] = useState([]);
 
   useEffect(() => {
-    contributionAPI.supporterStats().then((r) => setStats(r.data)).catch(() => setStats({}));
-    contributionAPI.supporterApproved().then((r) => setApproved(r.data)).catch(() => setApproved([]));
+    let mounted = true;
+    contributionAPI.supporterStats().then((r) => { if (mounted) setStats(r.data); }).catch(() => { if (mounted) setStats({}); });
+    contributionAPI.supporterApproved().then((r) => { if (mounted) setApproved(r.data); }).catch(() => { if (mounted) setApproved([]); });
+    return () => { mounted = false; };
   }, []);
 
   if (!stats) return <Spinner />;

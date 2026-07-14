@@ -17,10 +17,16 @@ export default function CampaignDetails() {
   const [reportDone, setReportDone] = useState(false);
 
   useEffect(() => {
+    let mounted = true;
     campaignAPI
       .getOne(id)
-      .then((r) => setCampaign(r.data))
-      .catch(() => setCampaign(false));
+      .then((r) => {
+        if (mounted) setCampaign(r.data);
+      })
+      .catch(() => {
+        if (mounted) setCampaign(false);
+      });
+    return () => { mounted = false; };
   }, [id]);
 
   if (campaign === null) return <Spinner />;

@@ -68,10 +68,16 @@ export default function Home() {
   const [top, setTop] = useState(null);
 
   useEffect(() => {
+    let mounted = true;
     campaignAPI
       .topFunded()
-      .then((r) => setTop(r.data))
-      .catch(() => setTop([]));
+      .then((r) => {
+        if (mounted) setTop(r.data);
+      })
+      .catch(() => {
+        if (mounted) setTop([]);
+      });
+    return () => { mounted = false; };
   }, []);
 
   return (

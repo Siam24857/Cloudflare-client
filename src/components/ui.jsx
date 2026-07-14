@@ -42,7 +42,9 @@ export function EmptyState({ message }) {
 
 export function Modal({ open, onClose, title, children }) {
   useEffect(() => {
-    const onKey = (e) => e.key === "Escape" && onClose();
+    const onKey = (e) => {
+      if (e.key === "Escape") onClose();
+    };
     if (open) document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [open, onClose]);

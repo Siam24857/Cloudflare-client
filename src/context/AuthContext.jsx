@@ -8,22 +8,28 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
     const token = localStorage.getItem("token");
     const savedUser = localStorage.getItem("user");
     if (token && savedUser) {
       setUser(JSON.parse(savedUser));
       authAPI
         .me()
-        .then((res) => setUser(res.data))
+        .then((res) => {
+          if (mounted) setUser(res.data);
+        })
         .catch(() => {
           localStorage.removeItem("token");
           localStorage.removeItem("user");
-          setUser(null);
+          if (mounted) setUser(null);
         })
-        .finally(() => setLoading(false));
+        .finally(() => {
+          if (mounted) setLoading(false);
+        });
     } else {
       setLoading(false);
     }
+    return () => { mounted = false; };
   }, []);
 
   const login = (token, userData) => {

@@ -15,10 +15,16 @@ export default function ExploreCampaigns() {
   }, [query, category]);
 
   useEffect(() => {
+    let mounted = true;
     campaignAPI
       .approved(page, limit)
-      .then((r) => setData(r.data))
-      .catch(() => setData({ campaigns: [], total: 0, totalPages: 0 }));
+      .then((r) => {
+        if (mounted) setData(r.data);
+      })
+      .catch(() => {
+        if (mounted) setData({ campaigns: [], total: 0, totalPages: 0 });
+      });
+    return () => { mounted = false; };
   }, [page]);
 
   const campaigns = data?.campaigns ?? null;

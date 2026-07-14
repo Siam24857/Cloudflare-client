@@ -7,8 +7,11 @@ export default function ManageCampaigns() {
   const [list, setList] = useState(null);
   const [busy, setBusy] = useState(null);
 
-  const load = () =>
-    campaignAPI.adminAll().then((r) => setList(r.data)).catch(() => setList([]));
+  const load = () => {
+    let mounted = true;
+    campaignAPI.adminAll().then((r) => { if (mounted) setList(r.data); }).catch(() => { if (mounted) setList([]); });
+    return () => { mounted = false; };
+  };
   useEffect(load, []);
 
   const remove = async (id) => {

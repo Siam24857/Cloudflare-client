@@ -7,8 +7,11 @@ export default function Reports() {
   const [reports, setReports] = useState(null);
   const [busy, setBusy] = useState(null);
 
-  const load = () =>
-    reportAPI.adminAll().then((r) => setReports(r.data)).catch(() => setReports([]));
+  const load = () => {
+    let mounted = true;
+    reportAPI.adminAll().then((r) => { if (mounted) setReports(r.data); }).catch(() => { if (mounted) setReports([]); });
+    return () => { mounted = false; };
+  };
   useEffect(load, []);
 
   const suspend = async (rep) => {

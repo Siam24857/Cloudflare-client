@@ -16,8 +16,10 @@ export default function Withdrawals() {
   const [busy, setBusy] = useState(false);
 
   const load = () => {
-    withdrawalAPI.creatorStats().then((r) => setStats(r.data)).catch(() => setStats({ raisedCredits: 0, withdrawalDollars: 0, canWithdraw: false }));
-    withdrawalAPI.creatorAll().then((r) => setList(r.data)).catch(() => setList([]));
+    let mounted = true;
+    withdrawalAPI.creatorStats().then((r) => { if (mounted) setStats(r.data); }).catch(() => { if (mounted) setStats({ raisedCredits: 0, withdrawalDollars: 0, canWithdraw: false }); });
+    withdrawalAPI.creatorAll().then((r) => { if (mounted) setList(r.data); }).catch(() => { if (mounted) setList([]); });
+    return () => { mounted = false; };
   };
   useEffect(load, []);
 
