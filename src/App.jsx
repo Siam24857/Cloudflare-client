@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import Navbar from "./components/Navbar.jsx";
 import Footer from "./components/Footer.jsx";
 import ProtectedRoute, { RoleRoute } from "./components/ProtectedRoute.jsx";
@@ -82,99 +82,97 @@ export default function App() {
 
       <Route
         path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <DashboardLayout />
-          </ProtectedRoute>
-        }
+        element={<ProtectedRoute />}
       >
-        <Route index element={<DashboardIndex />} />
-        <Route path="supporter-home" element={<SupporterHome />} />
-        <Route path="explore-campaigns" element={<ExploreCampaigns />} />
-        <Route path="campaign/:id" element={<CampaignDetails />} />
-        <Route path="my-contributions" element={<MyContributions />} />
-        <Route path="purchase-credit" element={<PurchaseCredit />} />
-        <Route path="payment-history" element={<SupporterPaymentHistory />} />
-        <Route
-          path="creator-home"
-          element={
-            <RoleRoute roles={["Creator", "Admin"]}>
-              <CreatorHome />
-            </RoleRoute>
-          }
-        />
-        <Route
-          path="add-campaign"
-          element={
-            <RoleRoute roles={["Creator"]}>
-              <AddCampaign />
-            </RoleRoute>
-          }
-        />
-        <Route
-          path="my-campaigns"
-          element={
-            <RoleRoute roles={["Creator"]}>
-              <MyCampaigns />
-            </RoleRoute>
-          }
-        />
-        <Route
-          path="withdrawals"
-          element={
-            <RoleRoute roles={["Creator"]}>
-              <Withdrawals />
-            </RoleRoute>
-          }
-        />
-        <Route
-          path="admin-home"
-          element={
-            <RoleRoute roles={["Admin"]}>
-              <AdminHome />
-            </RoleRoute>
-          }
-        />
-        <Route
-          path="campaign-approvals"
-          element={
-            <RoleRoute roles={["Admin"]}>
-              <CampaignApprovals />
-            </RoleRoute>
-          }
-        />
-        <Route
-          path="withdrawal-requests"
-          element={
-            <RoleRoute roles={["Admin"]}>
-              <WithdrawalRequests />
-            </RoleRoute>
-          }
-        />
-        <Route
-          path="manage-users"
-          element={
-            <RoleRoute roles={["Admin"]}>
-              <ManageUsers />
-            </RoleRoute>
-          }
-        />
-        <Route
-          path="manage-campaigns"
-          element={
-            <RoleRoute roles={["Admin"]}>
-              <ManageCampaigns />
-            </RoleRoute>
-          }
-        />
-        <Route
-          path="reports"
-          element={
-            <RoleRoute roles={["Admin"]}>
-              <Reports />
-            </RoleRoute>
-          }
-        />
+        <Route element={<DashboardLayout />}>
+          <Route index element={<DashboardIndex />} />
+          <Route path="supporter-home" element={<SupporterHome />} />
+          <Route path="explore-campaigns" element={<ExploreCampaigns />} />
+          <Route path="campaign/:id" element={<CampaignDetails />} />
+          <Route path="my-contributions" element={<MyContributions />} />
+          <Route path="purchase-credit" element={<PurchaseCredit />} />
+          <Route path="payment-history" element={<SupporterPaymentHistory />} />
+          <Route
+            path="creator-home"
+            element={
+              <RoleRoute roles={["Creator", "Admin"]}>
+                <CreatorHome />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="add-campaign"
+            element={
+              <RoleRoute roles={["Creator"]}>
+                <AddCampaign />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="my-campaigns"
+            element={
+              <RoleRoute roles={["Creator"]}>
+                <MyCampaigns />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="withdrawals"
+            element={
+              <RoleRoute roles={["Creator"]}>
+                <Withdrawals />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="admin-home"
+            element={
+              <RoleRoute roles={["Admin"]}>
+                <AdminHome />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="campaign-approvals"
+            element={
+              <RoleRoute roles={["Admin"]}>
+                <CampaignApprovals />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="withdrawal-requests"
+            element={
+              <RoleRoute roles={["Admin"]}>
+                <WithdrawalRequests />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="manage-users"
+            element={
+              <RoleRoute roles={["Admin"]}>
+                <ManageUsers />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="manage-campaigns"
+            element={
+              <RoleRoute roles={["Admin"]}>
+                <ManageCampaigns />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="reports"
+            element={
+              <RoleRoute roles={["Admin"]}>
+                <Reports />
+              </RoleRoute>
+            }
+          />
+        </Route>
       </Route>
 
       <Route path="*" element={<NotFound />} />
