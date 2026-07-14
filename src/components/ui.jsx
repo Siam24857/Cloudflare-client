@@ -66,6 +66,58 @@ export function Modal({ open, onClose, title, children }) {
   );
 }
 
+export function Pagination({ page, totalPages, onPageChange }) {
+  if (totalPages <= 1) return null;
+  const pages = [];
+  const start = Math.max(1, page - 2);
+  const end = Math.min(totalPages, page + 2);
+  for (let i = start; i <= end; i++) pages.push(i);
+
+  return (
+    <div className="flex items-center justify-center gap-2 py-8">
+      <button
+        disabled={page <= 1}
+        onClick={() => onPageChange(page - 1)}
+        className="btn-outline px-3 py-1 text-sm disabled:opacity-40"
+      >
+        Prev
+      </button>
+      {start > 1 && (
+        <>
+          <button onClick={() => onPageChange(1)} className="btn-outline px-3 py-1 text-sm">1</button>
+          {start > 2 && <span className="text-slate-400">…</span>}
+        </>
+      )}
+      {pages.map((p) => (
+        <button
+          key={p}
+          onClick={() => onPageChange(p)}
+          className={`px-3 py-1 text-sm font-medium rounded-lg ${
+            p === page
+              ? "bg-brand-600 text-white"
+              : "btn-outline"
+          }`}
+        >
+          {p}
+        </button>
+      ))}
+      {end < totalPages && (
+        <>
+          {end < totalPages - 1 && <span className="text-slate-400">…</span>}
+          <button onClick={() => onPageChange(totalPages)} className="btn-outline px-3 py-1 text-sm">{totalPages}</button>
+        </>
+      )}
+      <button
+        disabled={page >= totalPages}
+        onClick={() => onPageChange(page + 1)}
+        className="btn-outline px-3 py-1 text-sm disabled:opacity-40"
+      >
+        Next
+      </button>
+    </div>
+  );
+}
+
 export function StatusBadge({ status }) {
   const map = {
     pending: "bg-amber-100 text-amber-700",

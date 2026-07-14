@@ -50,5 +50,9 @@ body {
 }
 
 .swiper-pagination-bullet-active {
-  background-color: #4f46e5 !important;
+  background-color: #2563eb !important;
+}
+
+.hero-clip {
+  clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
 }

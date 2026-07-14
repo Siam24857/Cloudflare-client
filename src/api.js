@@ -34,7 +34,8 @@ export const userAPI = {
 
 // ---------- Campaigns ----------
 export const campaignAPI = {
-  approved: () => api.get("/api/campaigns/approved"),
+  approved: (page = 1, limit = 12) =>
+    api.get(`/api/campaigns/approved?page=${page}&limit=${limit}`),
   topFunded: () => api.get("/api/campaigns/top-funded"),
   getOne: (id) => api.get(`/api/campaigns/${id}`),
   create: (data) => api.post("/api/campaigns", data),
@@ -90,7 +91,9 @@ export const reportAPI = {
   resolve: (id) => api.patch(`/api/reports/${id}/resolve`),
 };
 
-// ---------- Upload (imgBB) ----------
+// ---------- Upload (Cloudinary) ----------
 export const uploadAPI = {
   image: (imageBase64) => api.post("/api/upload", { imageBase64 }),
+  publicImage: (imageBase64) =>
+    api.post("/api/upload/public", { imageBase64 }),
 };

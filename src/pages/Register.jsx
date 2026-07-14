@@ -2,8 +2,10 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { authAPI, uploadAPI } from "../api.js";
 import { useAuth } from "../context/AuthContext.jsx";
+import { GoogleLogin } from "@react-oauth/google";
 import { Spinner } from "../components/ui.jsx";
 import { FaGoogle, FaImage } from "react-icons/fa";
+import { compressImageToDataUrl } from "../utils/image.js";
 
 const hasGoogle = !!import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -48,12 +50,8 @@ export default function Register() {
     if (!file) return;
     setUploading(true);
     try {
-      const base64 = await new Promise((resolve) => {
-        const r = new FileReader();
-        r.onload = () => resolve(r.result.split(",")[1]);
-        r.readAsDataURL(file);
-      });
-      const res = await uploadAPI.image(base64);
+      const dataUrl = await compressImageToDataUrl(file);
+      const res = await uploadAPI.publicImage(dataUrl);
       set("photoURL", res.data.url);
     } catch (err) {
       setError("Image upload failed, you can paste a URL instead.");

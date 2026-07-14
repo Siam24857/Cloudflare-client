@@ -1,33 +1,43 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
 import { campaignAPI } from "../../api.js";
-import { Spinner, SectionTitle, EmptyState } from "../../components/ui.jsx";
+import { Spinner, SectionTitle, EmptyState, Pagination } from "../../components/ui.jsx";
 import CampaignCard from "../../components/CampaignCard.jsx";
 
 export default function ExploreCampaigns() {
-  const [campaigns, setCampaigns] = useState(null);
+  const [data, setData] = useState(null);
+  const [page, setPage] = useState(1);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
+  const limit = 12;
+
+  useEffect(() => {
+    setPage(1);
+  }, [query, category]);
 
   useEffect(() => {
     campaignAPI
-      .approved()
-      .then((r) => setCampaigns(r.data))
-      .catch(() => setCampaigns([]));
-  }, []);
+      .approved(page, limit)
+      .then((r) => setData(r.data))
+      .catch(() => setData({ campaigns: [], total: 0, totalPages: 0 }));
+  }, [page]);
 
-  const categories = campaigns
-    ? ["All", ...new Set(campaigns.map((c) => c.category))]
-    : ["All"];
+  const campaigns = data?.campaigns ?? null;
+  const totalPages = data?.totalPages ?? 0;
 
-  const filtered = campaigns
-    ? campaigns.filter((c) => {
-        const q =
-          c.campaign_title.toLowerCase().includes(query.toLowerCase()) ||
-          c.creator_name.toLowerCase().includes(query.toLowerCase());
-        return q && (category === "All" || c.category === category);
-      })
-    : [];
+  const categories = useMemo(() => {
+    if (!campaigns) return ["All"];
+    return ["All", ...new Set(campaigns.map((c) => c.category))];
+  }, [campaigns]);
+
+  const filtered = useMemo(() => {
+    if (!campaigns) return [];
+    return campaigns.filter((c) => {
+      const matchesQuery =
+        c.campaign_title.toLowerCase().includes(query.toLowerCase()) ||
+        c.creator_name.toLowerCase().includes(query.toLowerCase());
+      return matchesQuery && (category === "All" || c.category === category);
+    });
+  }, [campaigns, query, category]);
 
   return (
     <div>
@@ -62,11 +72,14 @@ export default function ExploreCampaigns() {
       ) : filtered.length === 0 ? (
         <EmptyState message="No campaigns match your search." />
       ) : (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((c) => (
-            <CampaignCard key={c._id} campaign={c} link={`/dashboard/campaign/${c._id}`} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {filtered.map((c) => (
+              <CampaignCard key={c._id} campaign={c} link={`/dashboard/campaign/${c._id}`} />
+            ))}
+          </div>
+          <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
+        </>
       )}
     </div>
   );

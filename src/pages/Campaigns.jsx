@@ -1,19 +1,28 @@
 import { useEffect, useMemo, useState } from "react";
 import { campaignAPI } from "../api.js";
-import { Spinner, SectionTitle, EmptyState } from "../components/ui.jsx";
+import { Spinner, SectionTitle, EmptyState, Pagination } from "../components/ui.jsx";
 import CampaignCard from "../components/CampaignCard.jsx";
 
 export default function Campaigns() {
-  const [campaigns, setCampaigns] = useState(null);
+  const [data, setData] = useState(null);
+  const [page, setPage] = useState(1);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
+  const limit = 12;
+
+  useEffect(() => {
+    setPage(1);
+  }, [query, category]);
 
   useEffect(() => {
     campaignAPI
-      .approved()
-      .then((r) => setCampaigns(r.data))
-      .catch(() => setCampaigns([]));
-  }, []);
+      .approved(page, limit)
+      .then((r) => setData(r.data))
+      .catch(() => setData({ campaigns: [], total: 0, totalPages: 0 }));
+  }, [page]);
+
+  const campaigns = data?.campaigns ?? null;
+  const totalPages = data?.totalPages ?? 0;
 
   const categories = useMemo(() => {
     if (!campaigns) return ["All"];
@@ -67,11 +76,14 @@ export default function Campaigns() {
       ) : filtered.length === 0 ? (
         <EmptyState message="No campaigns match your search." />
       ) : (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((c) => (
-            <CampaignCard key={c._id} campaign={c} link={`/dashboard/campaign/${c._id}`} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {filtered.map((c) => (
+              <CampaignCard key={c._id} campaign={c} link={`/dashboard/campaign/${c._id}`} />
+            ))}
+          </div>
+          <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
+        </>
       )}
     </div>
   );
