@@ -215,7 +215,7 @@ export default function Home() {
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           {categories.map((c) => (
             <Link
-              to="/campaigns"
+              to={`/campaigns?category=${encodeURIComponent(c.name)}`}
               key={c.name}
               className={`flex h-28 items-center justify-center rounded-2xl text-lg font-semibold ${c.color} transition hover:scale-105`}
             >

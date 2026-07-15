@@ -1,23 +1,27 @@
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { campaignAPI } from "../api.js";
 import { Spinner, SectionTitle, EmptyState, Pagination } from "../components/ui.jsx";
 import CampaignCard from "../components/CampaignCard.jsx";
 
 export default function Campaigns() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [data, setData] = useState(null);
   const [page, setPage] = useState(1);
-  const [query, setQuery] = useState("");
-  const [category, setCategory] = useState("All");
   const limit = 12;
+
+  const query = searchParams.get("search") || "";
+  const category = searchParams.get("category") || "All";
+  const sort = searchParams.get("sort") || "newest";
 
   useEffect(() => {
     setPage(1);
-  }, [query, category]);
+  }, [query, category, sort]);
 
   useEffect(() => {
     let mounted = true;
     campaignAPI
-      .approved(page, limit)
+      .approved(page, limit, query, category, sort)
       .then((r) => {
         if (mounted) setData(r.data);
       })
@@ -25,7 +29,7 @@ export default function Campaigns() {
         if (mounted) setData({ campaigns: [], total: 0, totalPages: 0 });
       });
     return () => { mounted = false; };
-  }, [page]);
+  }, [page, query, category, sort]);
 
   const campaigns = data?.campaigns ?? null;
   const totalPages = data?.totalPages ?? 0;
@@ -35,16 +39,43 @@ export default function Campaigns() {
     return ["All", ...new Set(campaigns.map((c) => c.category))];
   }, [campaigns]);
 
-  const filtered = useMemo(() => {
-    if (!campaigns) return [];
-    return campaigns.filter((c) => {
-      const matchesQuery =
-        c.campaign_title.toLowerCase().includes(query.toLowerCase()) ||
-        c.creator_name.toLowerCase().includes(query.toLowerCase());
-      const matchesCat = category === "All" || c.category === category;
-      return matchesQuery && matchesCat;
+  const handleSearchChange = (value) => {
+    setSearchParams((prev) => {
+      const params = new URLSearchParams(prev);
+      if (value) params.set("search", value);
+      else params.delete("search");
+      params.set("page", "1");
+      return params;
     });
-  }, [campaigns, query, category]);
+  };
+
+  const handleCategoryChange = (cat) => {
+    setSearchParams((prev) => {
+      const params = new URLSearchParams(prev);
+      if (cat && cat !== "All") params.set("category", cat);
+      else params.delete("category");
+      params.set("page", "1");
+      return params;
+    });
+  };
+
+  const handleSortChange = (sortValue) => {
+    setSearchParams((prev) => {
+      const params = new URLSearchParams(prev);
+      if (sortValue && sortValue !== "newest") params.set("sort", sortValue);
+      else params.delete("sort");
+      params.set("page", "1");
+      return params;
+    });
+  };
+
+  const handlePageChange = (newPage) => {
+    setSearchParams((prev) => {
+      const params = new URLSearchParams(prev);
+      params.set("page", newPage.toString());
+      return params;
+    });
+  };
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12">
@@ -53,18 +84,18 @@ export default function Campaigns() {
         subtitle="Discover projects and causes worth supporting."
       />
 
-      <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-center">
+      <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <input
           className="input md:max-w-xs"
           placeholder="Search by title or creator…"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => handleSearchChange(e.target.value)}
         />
         <div className="flex flex-wrap gap-2">
           {categories.map((c) => (
             <button
               key={c}
-              onClick={() => setCategory(c)}
+              onClick={() => handleCategoryChange(c)}
               className={`badge ${
                 category === c
                   ? "bg-brand-600 text-white"
@@ -75,20 +106,31 @@ export default function Campaigns() {
             </button>
           ))}
         </div>
+        <select
+          className="input w-auto"
+          value={sort}
+          onChange={(e) => handleSortChange(e.target.value)}
+        >
+          <option value="newest">Newest</option>
+          <option value="oldest">Oldest</option>
+          <option value="most-funded">Most Funded</option>
+          <option value="least-funded">Least Funded</option>
+          <option value="ending-soon">Ending Soon</option>
+        </select>
       </div>
 
       {campaigns === null ? (
         <Spinner />
-      ) : filtered.length === 0 ? (
+      ) : campaigns.length === 0 ? (
         <EmptyState message="No campaigns match your search." />
       ) : (
         <>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((c) => (
+            {campaigns.map((c) => (
               <CampaignCard key={c._id} campaign={c} link={`/dashboard/campaign/${c._id}`} />
             ))}
           </div>
-          <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
+          <Pagination page={page} totalPages={totalPages} onPageChange={handlePageChange} />
         </>
       )}
     </div>

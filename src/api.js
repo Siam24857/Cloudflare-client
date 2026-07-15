@@ -34,8 +34,13 @@ export const userAPI = {
 
 // ---------- Campaigns ----------
 export const campaignAPI = {
-  approved: (page = 1, limit = 12) =>
-    api.get(`/api/campaigns/approved?page=${page}&limit=${limit}`),
+  approved: (page = 1, limit = 12, search = "", category = "All", sort = "newest") => {
+    const params = new URLSearchParams({ page, limit });
+    if (search) params.append("search", search);
+    if (category && category !== "All") params.append("category", category);
+    if (sort && sort !== "newest") params.append("sort", sort);
+    return api.get(`/api/campaigns/approved?${params.toString()}`);
+  },
   topFunded: () => api.get("/api/campaigns/top-funded"),
   getOne: (id) => api.get(`/api/campaigns/${id}`),
   create: (data) => api.post("/api/campaigns", data),
